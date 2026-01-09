@@ -1,0 +1,11 @@
+---
+# playbooks/bootstrap.yml
+# Base system configuration for all nodes (control plane, workers, storage)
+
+- name: Bootstrap base system configuration
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - common
