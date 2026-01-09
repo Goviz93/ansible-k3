@@ -12,7 +12,7 @@ facts/
 
 # Ansible collections descargadas localmente
 collections/
-roles/
+#roles/
 
 # =====================================================
 # Inventory & secrets (NO versionar)
