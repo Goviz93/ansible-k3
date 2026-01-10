@@ -23,6 +23,21 @@
   register: k3s_binary
 
 # ------------------------------------------------------------
+# Read K3s join token from control plane
+# ------------------------------------------------------------
+
+- name: Read K3s join token from control plane
+  slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  register: k3s_join_token_raw
+  delegate_to: "{{ k3s_control_plane_host }}"
+  become: true
+
+- name: Decode K3s join token
+  set_fact:
+    k3s_join_token: "{{ k3s_join_token_raw.content | b64decode | trim }}"
+
+# ------------------------------------------------------------
 # Join node to K3s cluster
 # ------------------------------------------------------------
 
@@ -30,7 +45,7 @@
   shell: |
     curl -sfL https://get.k3s.io | \
     K3S_URL="{{ k3s_server_url }}" \
-    K3S_TOKEN="{{ hostvars[k3s_control_plane_host].k3s_control_plane_token }}" \
+    K3S_TOKEN="{{ k3s_join_token }}" \
     INSTALL_K3S_VERSION="{{ k3s_version }}" \
     INSTALL_K3S_EXEC="{{ k3s_agent_exec }}" \
     sh -
