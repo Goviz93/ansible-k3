@@ -2,6 +2,23 @@
 # roles/k3s-control-plane/tasks/main.yml
 
 # ------------------------------------------------------------
+# Build K3s server install flags
+# ------------------------------------------------------------
+
+- name: Build K3s server install arguments
+  set_fact:
+    k3s_server_exec: >-
+      server
+      {% for component in k3s_disable_components %}
+      --disable {{ component }}
+      {% endfor %}
+      --node-name {{ k3s_node_name }}
+      --write-kubeconfig-mode 644
+      {% for arg in k3s_extra_args %}
+      {{ arg }}
+      {% endfor %}
+
+# ------------------------------------------------------------
 # Install K3s server (control plane)
 # ------------------------------------------------------------
 
@@ -14,10 +31,7 @@
   shell: |
     curl -sfL https://get.k3s.io | \
     INSTALL_K3S_VERSION="{{ k3s_version }}" \
-    INSTALL_K3S_EXEC="server \
-    {% for component in k3s_disable_components %}--disable {{ component }} {% endfor %} \
-    --node-name {{ k3s_node_name }} \
-    {% for arg in k3s_extra_args %}{{ arg }} {% endfor %}" \
+    INSTALL_K3S_EXEC="{{ k3s_server_exec }}" \
     sh -
   args:
     creates: /usr/local/bin/k3s
@@ -34,14 +48,14 @@
     enabled: true
     state: started
   become: true
+  changed_when: false
 
 # ------------------------------------------------------------
 # Wait for Kubernetes API to be ready
 # ------------------------------------------------------------
 
 - name: Wait for Kubernetes API to be available
-  shell: |
-    kubectl get nodes
+  command: kubectl get nodes
   register: k3s_api_check
   retries: 10
   delay: 10
@@ -50,8 +64,20 @@
   become: true
 
 # ------------------------------------------------------------
+# Validate control plane node is Ready
+# ------------------------------------------------------------
+
+- name: Validate control plane node is Ready
+  command: kubectl get nodes --no-headers
+  register: k3s_nodes_status
+  retries: 10
+  delay: 10
+  until: "' Ready ' in k3s_nodes_status.stdout"
+  changed_when: false
+  become: true
+
+# ------------------------------------------------------------
 # Read K3s node token (for future agent joins)
-# fact is a runtime variable to store something!
 # ------------------------------------------------------------
 
 - name: Read K3s node token
@@ -60,6 +86,10 @@
   register: k3s_node_token
   become: true
 
-- name: Set K3s node token fact
+- name: Set K3s join token fact (control plane)
   set_fact:
     k3s_join_token: "{{ k3s_node_token.content | b64decode | trim }}"
+
+- name: Expose K3s join token for other hosts (hostvars)
+  set_fact:
+    k3s_control_plane_token: "{{ k3s_join_token }}"
