@@ -1,0 +1,11 @@
+---
+# playbooks/k3s-agents.yml
+# Join worker nodes to existing K3s cluster
+
+- name: Join K3s worker nodes
+  hosts: k3s_agents
+  become: true
+  gather_facts: true
+
+  roles:
+    - k3s-agent

@@ -1,0 +1,64 @@
+---
+# roles/k3s-agent/tasks/main.yml
+
+# ------------------------------------------------------------
+# Build K3s agent install arguments
+# ------------------------------------------------------------
+
+- name: Build K3s agent install arguments
+  set_fact:
+    k3s_agent_exec: >-
+      agent
+      {% for arg in k3s_agent_extra_args | default([]) %}
+      {{ arg }}
+      {% endfor %}
+
+# ------------------------------------------------------------
+# Check if K3s agent is already installed
+# ------------------------------------------------------------
+
+- name: Check if K3s agent is already installed
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary
+
+# ------------------------------------------------------------
+# Join node to K3s cluster
+# ------------------------------------------------------------
+
+- name: Download and install K3s agent
+  shell: |
+    curl -sfL https://get.k3s.io | \
+    K3S_URL="{{ k3s_server_url }}" \
+    K3S_TOKEN="{{ hostvars[k3s_control_plane_host].k3s_control_plane_token }}" \
+    INSTALL_K3S_VERSION="{{ k3s_version }}" \
+    INSTALL_K3S_EXEC="{{ k3s_agent_exec }}" \
+    sh -
+  args:
+    creates: /usr/local/bin/k3s
+  become: true
+  when: not k3s_binary.stat.exists
+
+# ------------------------------------------------------------
+# Ensure K3s agent service is enabled and running
+# ------------------------------------------------------------
+
+- name: Enable and start K3s agent service
+  systemd:
+    name: k3s-agent
+    enabled: true
+    state: started
+  become: true
+  changed_when: false
+
+# ------------------------------------------------------------
+# Validate agent service is running
+# ------------------------------------------------------------
+
+- name: Validate K3s agent service is active
+  systemd:
+    name: k3s-agent
+    state: started
+  register: k3s_agent_status
+  changed_when: false
+  become: true
