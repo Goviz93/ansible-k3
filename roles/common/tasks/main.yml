@@ -2,6 +2,18 @@
 # roles/common/tasks/main.yml
 
 # ------------------------------------------------------------
+# Ensure temporary directories exist and are writable
+# ------------------------------------------------------------
+
+- name: Ensure /tmp directory exists with correct permissions
+  file:
+    path: /tmp
+    state: directory
+    mode: "1777"
+  become: true
+
+
+# ------------------------------------------------------------
 # Update apt cache
 # ------------------------------------------------------------
 - name: Update apt cache
