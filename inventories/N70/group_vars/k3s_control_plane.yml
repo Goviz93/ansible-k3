@@ -1,4 +1,4 @@
-# inventories/N70/group_vars/k3s_servers.yml
+# inventories/N70/group_vars/k3s_control_plane.yml
 
 # ------------------------------------------------------------
 # K3s version
