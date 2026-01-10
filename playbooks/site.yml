@@ -1,0 +1,18 @@
+---
+# playbooks/site.yml
+# Master playbook to provision the full K3s BETA cluster
+
+# ------------------------------------------------------------
+# 1. Bootstrap all nodes
+# ------------------------------------------------------------
+- import_playbook: bootstrap.yml
+
+# ------------------------------------------------------------
+# 2. Install K3s Control Plane
+# ------------------------------------------------------------
+- import_playbook: k3s-control-plane.yml
+
+# ------------------------------------------------------------
+# 3. Join K3s Agents
+# ------------------------------------------------------------
+- import_playbook: k3s-agents.yml
