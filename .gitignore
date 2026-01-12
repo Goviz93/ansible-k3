@@ -1,0 +1,75 @@
+# =====================================================
+# Ansible runtime artifacts
+# =====================================================
+
+# Retry files
+*.retry
+
+# Fact cache (si se habilita)
+facts/
+.fact_cache/
+.ansible/
+
+# Ansible collections descargadas localmente
+collections/
+#roles/
+
+# =====================================================
+# Inventory & secrets (NO versionar)
+# =====================================================
+
+# Inventories reales por cliente/entorno
+#inventories/*/hosts
+#inventories/*/hosts.ini
+#inventories/*/group_vars/*vault*
+#inventories/*/host_vars/*vault*
+
+# Vault passwords
+.vault_pass
+.vault_password
+vault_pass.txt
+
+# Variables sensibles
+*secrets*.yml
+*secret*.yml
+
+# =====================================================
+# Logs y outputs
+# =====================================================
+
+*.log
+logs/
+output/
+
+# =====================================================
+# Archivos temporales y del sistema
+# =====================================================
+
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# =====================================================
+# Entornos locales / IDEs
+# =====================================================
+
+.vscode/
+.idea/
+*.iml
+
+# Python virtualenvs (si usas helpers)
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# =====================================================
+# Terraform (si convive en el repo)
+# =====================================================
+
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
