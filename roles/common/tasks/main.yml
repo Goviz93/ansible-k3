@@ -1,0 +1,94 @@
+---
+# roles/common/tasks/main.yml
+
+# ------------------------------------------------------------
+# Ensure temporary directories exist and are writable
+# ------------------------------------------------------------
+
+- name: Ensure /tmp directory exists with correct permissions
+  file:
+    path: /tmp
+    state: directory
+    mode: "1777"
+  become: true
+
+
+# ------------------------------------------------------------
+# Update apt cache
+# ------------------------------------------------------------
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  become: true
+
+# ------------------------------------------------------------
+# Install base packages
+# ------------------------------------------------------------
+- name: Install base system packages
+  apt:
+    name:
+      - curl
+      - wget
+      - vim
+      - htop
+      - ca-certificates
+      - apt-transport-https
+      - gnupg
+      - lsb-release
+    state: present
+  become: true
+
+# ------------------------------------------------------------
+# Set timezone
+# ------------------------------------------------------------
+- name: Set system timezone
+  timezone:
+    name: "{{ timezone | default('UTC') }}"
+  become: true
+
+# ------------------------------------------------------------
+# Disable swap (required by Kubernetes)
+# ------------------------------------------------------------
+- name: Disable swap immediately
+  command: swapoff -a
+  when: ansible_swaptotal_mb | int > 0
+  become: true
+
+- name: Remove swap entries from /etc/fstab
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*\sswap\s.*)$'
+    replace: '# \1'
+  become: true
+
+# ------------------------------------------------------------
+# Load required kernel modules
+# ------------------------------------------------------------
+- name: Load br_netfilter module
+  modprobe:
+    name: br_netfilter
+    state: present
+  become: true
+
+- name: Ensure br_netfilter is loaded on boot
+  lineinfile:
+    path: /etc/modules-load.d/k8s.conf
+    line: br_netfilter
+    create: yes
+  become: true
+
+# ------------------------------------------------------------
+# Sysctl settings required by Kubernetes
+# ------------------------------------------------------------
+- name: Set sysctl parameters for Kubernetes
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  loop:
+    - { name: net.ipv4.ip_forward, value: 1 }
+    - { name: net.bridge.bridge-nf-call-iptables, value: 1 }
+    - { name: net.bridge.bridge-nf-call-ip6tables, value: 1 }
+  become: true

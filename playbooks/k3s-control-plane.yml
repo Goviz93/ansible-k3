@@ -1,0 +1,11 @@
+---
+# playbooks/k3s-control-plane.yml
+# Install and configure K3s Control Plane (single-node, BETA)
+
+- name: Install K3s Control Plane
+  hosts: k3s_control_plane
+  become: true
+  gather_facts: true
+
+  roles:
+    - k3s-control-plane
