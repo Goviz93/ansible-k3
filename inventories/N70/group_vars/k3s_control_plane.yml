@@ -12,11 +12,11 @@ k3s_disable_components:
 # ------------------------------------------------------------
 # K3s server networking (API exposure via Tailscale)
 # ------------------------------------------------------------
-k3s_advertise_address: "100.84.110.57"
+k3s_advertise_address: "100.83.214.119"
 k3s_bind_address: "0.0.0.0"
 
 k3s_tls_sans:
-  - "100.84.110.57"
+  - "100.83.214.119"
 
 # ------------------------------------------------------------
 # K3s server extra arguments
