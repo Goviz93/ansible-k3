@@ -19,6 +19,25 @@
       {% endfor %}
 
 # ------------------------------------------------------------
+# Render K3s server persistent configuration (BEFORE install)
+# ------------------------------------------------------------
+
+- name: Ensure K3s config directory exists
+  file:
+    path: /etc/rancher/k3s
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Render K3s server config.yaml
+  template:
+    src: k3s-config.yaml.j2
+    dest: /etc/rancher/k3s/config.yaml
+    mode: "0644"
+  become: true
+  notify: Restart K3s
+
+# ------------------------------------------------------------
 # Install K3s server (control plane)
 # ------------------------------------------------------------
 

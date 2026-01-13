@@ -1,0 +1,14 @@
+# ------------------------------------------------------------
+# K3s server configuration
+# Managed by Ansible (ansible-k3)
+# ------------------------------------------------------------
+
+advertise-address: {{ k3s_advertise_address }}
+bind-address: {{ k3s_bind_address }}
+
+{% if k3s_tls_sans is defined and k3s_tls_sans | length > 0 %}
+tls-san:
+{% for san in k3s_tls_sans %}
+  - {{ san }}
+{% endfor %}
+{% endif %}

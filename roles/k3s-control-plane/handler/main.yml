@@ -1,0 +1,10 @@
+---
+# ------------------------------------------------------------
+# Handlers for K3s control plane
+# ------------------------------------------------------------
+
+- name: Restart K3s
+  systemd:
+    name: k3s
+    state: restarted
+  become: true
