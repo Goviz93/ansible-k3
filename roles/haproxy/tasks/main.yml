@@ -1,0 +1,28 @@
+---
+# roles/haproxy/tasks/main.yml
+# Install and configure HAProxy as external load balancer
+
+- name: Ensure HAProxy package is installed (version pinned)
+  apt:
+    name: "haproxy={{ haproxy_version }}"
+    state: present
+    update_cache: true
+
+- name: Ensure HAProxy service is enabled
+  systemd:
+    name: haproxy
+    enabled: true
+
+- name: Deploy HAProxy configuration file
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart HAProxy
+
+- name: Ensure HAProxy service is running
+  systemd:
+    name: haproxy
+    state: started

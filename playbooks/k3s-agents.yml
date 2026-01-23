@@ -3,7 +3,7 @@
 # Join worker nodes to existing K3s cluster
 
 - name: Join K3s worker nodes
-  hosts: k3s_agents
+  hosts: k3s_agents, storage
   become: true
   gather_facts: true
 

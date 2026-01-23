@@ -1,0 +1,8 @@
+---
+# roles/haproxy/handlers/main.yml
+# Handlers for HAProxy service
+
+- name: Restart HAProxy
+  systemd:
+    name: "{{ haproxy_service_name | default('haproxy') }}"
+    state: restarted
