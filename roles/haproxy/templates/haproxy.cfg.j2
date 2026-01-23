@@ -46,7 +46,7 @@ backend ingress_backends
     mode http
     balance roundrobin
 
-    option httpchk GET /
+    option tcp-check
 
     {% for host in groups['k3s_agents'] %}
     server {{ host }} {{ hostvars[host].ansible_host }}:{{ haproxy_ingress_nodeport | default(30080) }} check
