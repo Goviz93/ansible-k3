@@ -1,0 +1,12 @@
+---
+# playbooks/haproxy.yml
+# Playbook to provision and configure HAProxy
+# Target: external load balancer nodes (HAProxy-based)
+
+- name: Provision HAProxy load balancers
+  hosts: k3s_load_balancers_haproxy
+  become: true
+  gather_facts: true
+
+  roles:
+    - haproxy
