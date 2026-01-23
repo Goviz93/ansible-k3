@@ -1,5 +1,5 @@
 ---
-haproxy_version: "3.2.*"
+haproxy_version: "2.8.16"
 
 haproxy_service_name: haproxy
 haproxy_ingress_nodeport: 30080
