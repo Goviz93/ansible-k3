@@ -1,0 +1,6 @@
+---
+haproxy_version: "3.2.*"
+
+haproxy_service_name: haproxy
+haproxy_ingress_nodeport: 30080
+haproxy_config_path: /etc/haproxy/haproxy.cfg
